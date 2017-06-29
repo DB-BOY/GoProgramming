@@ -7,25 +7,14 @@ import (
 	"bufio"
 	"io"
 	"strconv"
+	"time"
+	"github.com/user/GoProgramming/Chapter2/sorter/qsort"
+	"github.com/user/GoProgramming/Chapter2/sorter/bubblesort"
 )
 
 var infile *string = flag.String("i", "infile", "File contains values for sorting")
 var outfile *string = flag.String("o", "outfile", "File to receive sorted values")
 var algorithm *string = flag.String("a", "qsort", "Sort algorithm")
-
-func main() {
-	flag.Parse()
-	if infile != nil {
-		fmt.Println("infile=", *infile, " outfile=", *outfile, "algorithm = ", *algorithm)
-	}
-	values, err := readValues(*infile)
-
-	if err == nil {
-		fmt.Println("Read values: ", values)
-	} else {
-		fmt.Println(err)
-	}
-}
 
 func readValues(infile string) (values []int, error error) {
 	file, err := os.Open(infile)
@@ -49,7 +38,7 @@ func readValues(infile string) (values []int, error error) {
 			fmt.Println("A too long line, seems unexpected.")
 			return
 		}
-		str := string(line)
+		str := string(line) //转换字符数组为字符串
 
 		value, err1 := strconv.Atoi(str)
 		if err1 != nil {
@@ -74,4 +63,30 @@ func writeValue(values []int, outfile string) error {
 		file.WriteString(str + "\n")
 	}
 	return nil
+}
+
+func main() {
+	flag.Parse()
+	if infile != nil {
+		fmt.Println("infile=", *infile, " outfile=", *outfile, "algorithm = ", *algorithm)
+	}
+	values, err := readValues(*infile)
+
+	if err == nil {
+		t1 := time.Now()
+		switch *algorithm {
+		case "qsort":
+			qsort.QuickSort(values)
+		case "bubble":
+			bubblesort.BubbleSort(values)
+		default:
+			fmt.Println("Sorting algorithm", *algorithm, "is either unknown or unsupported.")
+		}
+		t2 := time.Now()
+
+		fmt.Println(" The sorting process costs ", t2.Sub(t1), " to complete.")
+		writeValue(values, * outfile)
+	} else {
+		fmt.Println(err)
+	}
 }
